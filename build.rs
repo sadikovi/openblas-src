@@ -13,6 +13,14 @@ fn main() {
     } else {
         "dylib"
     };
+
+    let num_threads = env::var("NUM_THREADS");
+    let num_threads_arg = if num_threads.is_ok() {
+        format!("NUM_THREADS={}", num_threads.unwrap())
+    } else {
+        format!("USE_THREAD=1")
+    };
+
     if !feature!("SYSTEM") {
         let cblas = feature!("CBLAS");
         let lapacke = feature!("LAPACKE");
@@ -25,6 +33,7 @@ fn main() {
                 .arg(format!("BINARY={}", binary!()))
                 .arg(format!("{}_CBLAS=1", switch!(cblas)))
                 .arg(format!("{}_LAPACKE=1", switch!(lapacke)))
+                .arg(num_threads_arg)
                 .arg(format!("-j{}", variable!("NUM_JOBS")))
                 .current_dir(&source),
         );
